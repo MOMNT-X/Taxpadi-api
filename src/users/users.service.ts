@@ -13,6 +13,7 @@ export class UsersService {
         id: true,
         email: true,
         name: true,
+        avatar: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -31,10 +32,12 @@ export class UsersService {
         id: true,
         email: true,
         name: true,
+        avatar: true,
         createdAt: true,
         updatedAt: true,
       },
     });
   }
 }
+
 

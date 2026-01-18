@@ -50,9 +50,9 @@ export class AuthController {
     const authResponse = await this.authService.googleAuth(req.user);
     const frontendUrl = this.configService.get<string>('app.frontendUrl');
 
-    // Redirect to frontend with tokens
+    // Redirect to frontend with tokens (route is /callback not /auth/callback)
     res.redirect(
-      `${frontendUrl}/auth/callback?token=${authResponse.accessToken}&refreshToken=${authResponse.refreshToken}`,
+      `${frontendUrl}/callback?token=${authResponse.accessToken}&refreshToken=${authResponse.refreshToken}`,
     );
   }
 
@@ -68,4 +68,5 @@ export class AuthController {
     return user;
   }
 }
+
 

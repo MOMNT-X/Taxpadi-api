@@ -7,7 +7,7 @@ export class TaxCalculatorService {
   // VAT rate: 7.5% (standard rate in Nigeria)
   private readonly VAT_RATE = 0.075;
 
-  // PAYE Tax Brackets (2024 rates - approximate)
+  // PAYE Tax Brackets (2025 rates - approximate)
   private readonly PAYE_BRACKETS = [
     { min: 0, max: 300000, rate: 0.07 }, // 7%
     { min: 300000, max: 600000, rate: 0.11 }, // 11%
@@ -141,4 +141,5 @@ export class TaxCalculatorService {
     }
   }
 }
+
 

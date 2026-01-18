@@ -32,6 +32,13 @@ export class ConversationsService {
     return this.mapToResponseDto(conversation);
   }
 
+  async updateTitle(conversationId: string, title: string): Promise<void> {
+    await this.prisma.conversation.update({
+      where: { id: conversationId },
+      data: { title },
+    });
+  }
+
   async findAll(userId: string): Promise<ConversationResponseDto[]> {
     const conversations = await this.prisma.conversation.findMany({
       where: { userId },
@@ -113,4 +120,5 @@ export class ConversationsService {
     };
   }
 }
+
 

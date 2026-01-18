@@ -50,6 +50,8 @@ export class MessagesService {
   }
 
   private mapToResponseDto(message: any): MessageResponseDto {
+    // Content is already extracted and plain text from the controller
+    // No need for extraction logic here
     return {
       id: message.id,
       conversationId: message.conversationId,
@@ -60,4 +62,5 @@ export class MessagesService {
     };
   }
 }
+
 

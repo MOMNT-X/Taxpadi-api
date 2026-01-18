@@ -1,19 +1,21 @@
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
-import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
-import configuration from './config/configuration';
-import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { ConversationsModule } from './conversations/conversations.module';
-import { MessagesModule } from './messages/messages.module';
-import { AiModule } from './ai/ai.module';
-import { TaxCalculatorModule } from './tax-calculator/tax-calculator.module';
-import { ArticlesModule } from './articles/articles.module';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
+import { Module } from "@nestjs/common";
+import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ThrottlerModule, ThrottlerGuard } from "@nestjs/throttler";
+import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from "@nestjs/core";
+import { ValidationPipe } from "@nestjs/common";
+import configuration from "./config/configuration";
+import { PrismaModule } from "./prisma/prisma.module";
+import { AuthModule } from "./auth/auth.module";
+import { UsersModule } from "./users/users.module";
+import { ConversationsModule } from "./conversations/conversations.module";
+import { MessagesModule } from "./messages/messages.module";
+import { AiModule } from "./ai/ai.module";
+import { TaxCalculatorModule } from "./tax-calculator/tax-calculator.module";
+import { ArticlesModule } from "./articles/articles.module";
+import { FilesModule } from "./files/files.module";
+import { SuggestionsModule } from "./suggestions/suggestions.module";
+import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
+import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
 
 @Module({
   imports: [
@@ -21,13 +23,12 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
       isGlobal: true,
       load: configuration,
     }),
-    ThrottlerModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: () => ({
-        ttl: 60,
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
         limit: 100,
-      }),
-    }),
+      },
+    ]),
     PrismaModule,
     AuthModule,
     UsersModule,
@@ -36,6 +37,8 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
     AiModule,
     TaxCalculatorModule,
     ArticlesModule,
+    FilesModule,
+    SuggestionsModule,
   ],
   providers: [
     {
@@ -62,4 +65,3 @@ import { TransformInterceptor } from './common/interceptors/transform.intercepto
   ],
 })
 export class AppModule {}
-

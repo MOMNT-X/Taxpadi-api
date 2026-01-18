@@ -11,6 +11,14 @@ import { SignupDto } from './dto/signup.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthResponseDto } from './dto/auth-response.dto';
 
+type MinimalUser = {
+  id: string;
+  email: string;
+  name: string;
+  googleId?: string | null;
+  avatar?: string | null;
+};
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -63,6 +71,12 @@ export class AuthService {
     // Find user
     const user = await this.prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        password: true,
+      },
     });
 
     if (!user || !user.password) {
@@ -90,12 +104,19 @@ export class AuthService {
   }
 
   async googleAuth(googleUser: any): Promise<AuthResponseDto> {
-    const { googleId, email, name } = googleUser;
+    const { googleId, email, name, avatar } = googleUser;
 
     // Find or create user
-    let user = await this.prisma.user.findFirst({
+    let user: MinimalUser | null = await this.prisma.user.findFirst({
       where: {
         OR: [{ googleId }, { email }],
+      },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        googleId: true,
+        avatar: true,
       },
     });
 
@@ -106,30 +127,34 @@ export class AuthService {
           googleId,
           email,
           name,
+          avatar,
         },
-        select: {
+      select: {
           id: true,
           email: true,
           name: true,
-        },
-      });
-    } else if (!user.googleId) {
-      // Update existing user with googleId
-      user = await this.prisma.user.update({
-        where: { id: user.id },
-        data: { googleId },
-        select: {
-          id: true,
-          email: true,
-          name: true,
+          avatar: true,
         },
       });
     } else {
-      user = {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-      };
+      // Update existing user with googleId and avatar if not present
+      const updateData: any = {};
+      if (!user.googleId) updateData.googleId = googleId;
+      if (!user.avatar && avatar) updateData.avatar = avatar;
+      
+      if (Object.keys(updateData).length > 0) {
+        user = await this.prisma.user.update({
+          where: { id: user.id },
+          data: updateData,
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            googleId: true,
+            avatar: true,
+          },
+        });
+      }
     }
 
     // Generate tokens
@@ -168,6 +193,8 @@ export class AuthService {
         id: true,
         email: true,
         name: true,
+        googleId: true,
+        avatar: true,
       },
     });
 
