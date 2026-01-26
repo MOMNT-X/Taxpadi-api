@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Delete,
   Body,
   Param,
@@ -76,18 +77,16 @@ export class ConversationsController {
     );
 
     // Call AI service with just the user's prompt message
+    // The AI service already extracts the ai_response field from the webhook
     const aiResponse = await this.aiService.sendPromptToWebhook(
       createMessageDto.content,
     );
 
-    // Extract ai_response from the webhook response
-    const extractedResponse = this.extractAiResponse(aiResponse.response);
-
-    // Save AI response (now contains extracted plain text)
+    // Save AI response (already contains extracted plain text from AI service)
     const assistantMessage = await this.messagesService.create(
       conversationId,
       'ASSISTANT',
-      extractedResponse,
+      aiResponse.response,
     );
 
     // Update conversation title from first user message if it's still the default
@@ -105,53 +104,31 @@ export class ConversationsController {
     };
   }
 
+  @Patch(':id')
+  @HttpCode(HttpStatus.OK)
+  async update(
+    @Param('id') id: string,
+    @CurrentUser() user: any,
+    @Body() updateDto: { title: string },
+  ) {
+    // Verify ownership
+    await this.conversationsService.findOne(id, user.id);
+    
+    // Update title
+    await this.conversationsService.updateTitle(id, updateDto.title);
+    
+    return {
+      message: 'Conversation updated successfully',
+    };
+  }
+
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async remove(@Param('id') id: string, @CurrentUser() user: any) {
     await this.conversationsService.remove(id, user.id);
   }
 
-  /**
-   * Extracts the ai_response field from the webhook response JSON.
-   * Tries multiple field names as fallbacks.
-   */
-  private extractAiResponse(responseString: string): string {
-    try {
-      // Try to parse as JSON
-      const parsed = JSON.parse(responseString);
 
-      // Try to extract ai_response field (primary format from Make.com webhook)
-      if (parsed.ai_response && typeof parsed.ai_response === 'string') {
-        this.logger.debug('Extracted ai_response field from webhook response');
-        return parsed.ai_response;
-      }
-
-      // Fallback: try response field
-      if (parsed.response && typeof parsed.response === 'string') {
-        this.logger.debug('Extracted response field from webhook response');
-        return parsed.response;
-      }
-
-      // Fallback: try other common field names
-      const commonFields = ['text', 'message', 'output', 'result', 'data'];
-      for (const field of commonFields) {
-        if (parsed[field] && typeof parsed[field] === 'string') {
-          this.logger.debug(`Extracted ${field} field from webhook response`);
-          return parsed[field];
-        }
-      }
-
-      // If no recognized field found, log warning and stringify object
-      this.logger.warn(
-        'Could not extract ai_response from webhook response, returning stringified object',
-      );
-      return JSON.stringify(parsed);
-    } catch (error) {
-      // If not JSON, return as-is (could be plain text response)
-      this.logger.debug('Response is plain text, returning as-is');
-      return responseString;
-    }
-  }
 }
 
 

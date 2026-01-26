@@ -29,14 +29,12 @@ export class PrismaService
               } 
             },
             log: [
-              { emit: 'stdout', level: 'query' },
               { emit: 'stdout', level: 'error' },
               { emit: 'stdout', level: 'warn' },
             ]
           }
         : {
             log: [
-              { emit: 'stdout', level: 'query' },
               { emit: 'stdout', level: 'error' },
               { emit: 'stdout', level: 'warn' },
             ]
