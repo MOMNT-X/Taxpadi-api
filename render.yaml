@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: taxpadi-api
+    env: docker
+    branch: main
+    dockerfilePath: Dockerfile
+    autoDeploy: true
+    instanceType: starter
+    region: oregon
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+
+# Notes:
+# - Create a Render PostgreSQL service and add the resulting DATABASE_URL and DIRECT_URL
+#   to this service's environment variables (or via Render Dashboard as secrets).
+# - Add other required environment variables on Render (JWT secrets, OAUTH_CLIENT_ID,
+#   OAUTH_CLIENT_SECRET, OPENAI_KEY / AI provider keys, etc.).
+# - If your default branch is not `main`, update the `branch` value above.
