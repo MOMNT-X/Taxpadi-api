@@ -22,8 +22,19 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Ensure TypeScript and NestJS config files are present
+RUN ls -la && echo "Checking for config files..." && \
+    test -f tsconfig.json && echo "✓ tsconfig.json found" || echo "✗ tsconfig.json missing" && \
+    test -f nest-cli.json && echo "✓ nest-cli.json found" || echo "✗ nest-cli.json missing"
+
+# Regenerate Prisma Client in builder stage (needed for NestJS build)
+RUN npx prisma generate
+
 # Build the application
 RUN npm run build
+
+# Verify build output
+RUN echo "Verifying build output..." && ls -la dist/ && echo "Build verification complete"
 
 # Production image
 FROM base AS runner
@@ -48,6 +59,9 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
 # Create uploads directory
 RUN mkdir -p /app/uploads && chown -R nestjs:nodejs /app
+
+# Verify dist folder exists in final image
+RUN echo "Verifying dist folder in final image..." && ls -la /app && ls -la /app/dist && echo "Verification complete"
 
 USER nestjs
 
