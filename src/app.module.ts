@@ -14,6 +14,7 @@ import { TaxCalculatorModule } from "./tax-calculator/tax-calculator.module";
 import { ArticlesModule } from "./articles/articles.module";
 import { FilesModule } from "./files/files.module";
 import { SuggestionsModule } from "./suggestions/suggestions.module";
+import { HealthModule } from "./health/health.module";
 import { HttpExceptionFilter } from "./common/filters/http-exception.filter";
 import { TransformInterceptor } from "./common/interceptors/transform.interceptor";
 
@@ -39,6 +40,7 @@ import { TransformInterceptor } from "./common/interceptors/transform.intercepto
     ArticlesModule,
     FilesModule,
     SuggestionsModule,
+    HealthModule,
   ],
   providers: [
     {
