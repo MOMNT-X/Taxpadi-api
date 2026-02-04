@@ -64,7 +64,7 @@ export class FilesService {
 
     // Return file URL (in production, this would be a CDN URL)
     const baseUrl =
-      this.configService.get<string>('app.url') || 'http://localhost:3000';
+      this.configService.get<string>('app.url') || 'https://taxpadi-api.onrender.com';
     const url = `${baseUrl}/uploads/${filename}`;
 
     return { url, filename };
